@@ -59,10 +59,10 @@ pub fn init(
     result.ww = try allocator.alloc(Station.Ww, result.stations.len);
     errdefer allocator.free(result.ww);
 
-    @memset(result.x, std.mem.zeroes(Station.X));
-    @memset(result.y, std.mem.zeroes(Station.Y));
-    @memset(result.wr, std.mem.zeroes(Station.Wr));
-    @memset(result.ww, std.mem.zeroes(Station.Ww));
+    @memset(result.x, std.mem.zeroInit(Station.X, .{}));
+    @memset(result.y, std.mem.zeroInit(Station.Y, .{}));
+    @memset(result.wr, std.mem.zeroInit(Station.Wr, .{}));
+    @memset(result.ww, std.mem.zeroInit(Station.Ww, .{}));
 
     var num_axes: usize = 0;
 

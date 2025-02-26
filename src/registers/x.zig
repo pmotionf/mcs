@@ -7,34 +7,16 @@ const Direction = registers.Direction;
 /// register bank.
 pub const X = packed struct(u64) {
     cc_link_enabled: bool = false,
-    _1: u1 = 0,
-    ready_for_command: bool = false,
-    servo_active: packed struct(u3) {
-        axis1: bool = false,
-        axis2: bool = false,
-        axis3: bool = false,
-
-        pub fn axis(self: @This(), a: u2) bool {
-            return switch (a) {
-                0 => self.axis1,
-                1 => self.axis2,
-                2 => self.axis3,
-                3 => {
-                    std.log.err(
-                        "Invalid axis index 3 for `servo_active`",
-                        .{},
-                    );
-                    unreachable;
-                },
-            };
-        }
-    } = .{},
+    command_ready: bool = false,
+    command_received: bool = false,
+    axis_cleared_carrier: bool = false,
+    cleared_carrier: bool = false,
+    _0x5: u1 = 0,
     servo_enabled: bool = false,
     emergency_stop_enabled: bool = false,
     paused: bool = false,
-    axis_carrier_info_cleared: bool = false,
-    command_received: bool = false,
-    axis_enabled: packed struct(u3) {
+    _0x9: u1 = 0,
+    motor_enabled: packed struct(u3) {
         axis1: bool = false,
         axis2: bool = false,
         axis3: bool = false,
@@ -46,26 +28,9 @@ pub const X = packed struct(u64) {
                 2 => self.axis3,
                 3 => {
                     std.log.err(
-                        "Invalid axis index 3 for `axis_enabled`",
+                        "Invalid axis index 3 for `motor_enabled`",
                         .{},
                     );
-                    unreachable;
-                },
-            };
-        }
-    } = .{},
-    in_position: packed struct(u3) {
-        axis1: bool = false,
-        axis2: bool = false,
-        axis3: bool = false,
-
-        pub fn axis(self: @This(), a: u2) bool {
-            return switch (a) {
-                0 => self.axis1,
-                1 => self.axis2,
-                2 => self.axis3,
-                3 => {
-                    std.log.err("Invalid axis index 3 for `in_position`", .{});
                     unreachable;
                 },
             };
@@ -73,22 +38,11 @@ pub const X = packed struct(u64) {
     } = .{},
     vdc_undervoltage_detected: bool = false,
     vdc_overvoltage_detected: bool = false,
-    _19: u4 = 0,
-    transmission_stopped: packed struct(u2) {
-        to_prev: bool = false,
-        to_next: bool = false,
-
-        pub fn to(self: @This(), dir: Direction) bool {
-            return switch (dir) {
-                .backward => self.to_prev,
-                .forward => self.to_next,
-            };
-        }
-    } = .{},
+    _0xF: u1 = 0,
     errors_cleared: bool = false,
     communication_error: packed struct(u2) {
-        to_prev: bool = false,
-        to_next: bool = false,
+        from_prev: bool = false,
+        from_next: bool = false,
 
         pub fn to(self: @This(), dir: Direction) bool {
             return switch (dir) {
@@ -118,7 +72,7 @@ pub const X = packed struct(u64) {
             };
         }
     } = .{},
-    _32: u3 = 0,
+    _0x17: u3 = 0,
     hall_alarm: packed struct(u6) {
         axis1: packed struct(u2) {
             back: bool = false,
@@ -157,23 +111,6 @@ pub const X = packed struct(u64) {
             };
         }
     } = .{},
-    self_pause: packed struct(u3) {
-        axis1: bool = false,
-        axis2: bool = false,
-        axis3: bool = false,
-
-        pub fn axis(self: @This(), a: u2) bool {
-            return switch (a) {
-                0 => self.axis1,
-                1 => self.axis2,
-                2 => self.axis3,
-                3 => {
-                    std.log.err("Invalid axis index 3 for `self_pause`", .{});
-                    unreachable;
-                },
-            };
-        }
-    } = .{},
     pulling_carrier: packed struct(u3) {
         axis1: bool = false,
         axis2: bool = false,
@@ -195,7 +132,8 @@ pub const X = packed struct(u64) {
         }
     } = .{},
     control_loop_max_time_exceeded: bool = false,
-    _48: u8 = 0,
+    _0x24: u12 = 0,
+    _0x30: u8 = 0,
     initial_data_processing_request: bool = false,
     initial_data_setting_complete: bool = false,
     error_status: bool = false,

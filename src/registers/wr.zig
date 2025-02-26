@@ -5,26 +5,7 @@ const registers = @import("../registers.zig");
 /// register bank.
 pub const Wr = packed struct(u256) {
     command_response: CommandResponseCode = .NoError,
-    pitch_count: packed struct(u48) {
-        axis1: i16 = 0,
-        axis2: i16 = 0,
-        axis3: i16 = 0,
-
-        pub fn axis(self: @This(), a: u2) i16 {
-            return switch (a) {
-                0 => self.axis1,
-                1 => self.axis2,
-                2 => self.axis3,
-                3 => {
-                    std.log.err(
-                        "Invalid axis index 3 for `pitch_count`",
-                        .{},
-                    );
-                    unreachable;
-                },
-            };
-        }
-    } = .{},
+    _16: u48 = 0,
     carrier: packed struct(u192) {
         axis1: Carrier = .{},
         axis2: Carrier = .{},
@@ -49,13 +30,18 @@ pub const Wr = packed struct(u256) {
     pub const Carrier = packed struct(u64) {
         location: f32 = 0.0,
         id: u16 = 0,
+        arrived: bool = false,
         auxiliary: bool = false,
         enabled: bool = false,
         /// Whether carrier is currently in quasi-enabled state. Quasi-enabled
         /// state occurs when carrier is first entering a module, before it
         /// has entered module enough to start servo control.
         quasi: bool = false,
-        _51: u5 = 0,
+        /// Whether carrier's CAS (collision avoidance system) is enabled.
+        cas: bool = false,
+        /// Whether carrier's CAS (collision avoidance system) is triggered.
+        cas_triggered: bool = false,
+        _54: u2 = 0,
         state: State = .None,
 
         pub const State = enum(u8) {
