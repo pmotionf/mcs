@@ -5,11 +5,19 @@ const registers = @import("../registers.zig");
 /// register bank.
 pub const Ww = packed struct(u256) {
     command: Command = .None,
-    carrier_id: u16 = 0,
-    location_distance: f32 = 0.0,
-    target_axis_number: u16 = 0,
-    speed_percentage: u16 = 0,
-    acceleration_percentage: u16 = 0,
+    axis: u16 = 0,
+    carrier: packed struct(u80) {
+        target: packed union {
+            f32: f32,
+            u32: u32,
+            i32: i32,
+        } = .{ .u32 = 0 },
+        id: u10 = 0,
+        cas: bool = false,
+        _: u5 = 0,
+        speed: u16 = 0,
+        acceleration: u16 = 0,
+    } = .{},
     _112: u144 = 0,
 
     pub const Command = enum(i16) {
@@ -51,4 +59,13 @@ pub const Ww = packed struct(u256) {
 
 test "Ww" {
     try std.testing.expectEqual(32, @sizeOf(Ww));
+    try std.testing.expectEqual(
+        32,
+        @bitSizeOf(
+            @FieldType(
+                @FieldType(Ww, "carrier"),
+                "target",
+            ),
+        ),
+    );
 }

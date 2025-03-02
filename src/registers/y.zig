@@ -7,41 +7,22 @@ const Direction = registers.Direction;
 /// register bank.
 pub const Y = packed struct(u64) {
     cc_link_enable: bool = false,
-    _1: u1 = 0,
     start_command: bool = false,
     reset_command_received: bool = false,
-    _4: u1 = 0,
+    /// Clear carrier information at axis specified in "Ww" register.
+    axis_clear_carrier: bool = false,
+    /// Clear all carriers recognized by driver.
+    clear_carrier: bool = false,
     axis_servo_release: bool = false,
     servo_release: bool = false,
     emergency_stop: bool = false,
     temporary_pause: bool = false,
-    stop_driver_transmission: packed struct(u2) {
-        to_prev: bool = false,
-        to_next: bool = false,
-
-        pub fn to(self: @This(), dir: Direction) bool {
-            return switch (dir) {
-                .backward => self.to_prev,
-                .forward => self.to_next,
-            };
-        }
-
-        pub fn setTo(
-            self: *align(8:9:8) @This(),
-            dir: Direction,
-            val: bool,
-        ) void {
-            switch (dir) {
-                .backward => self.to_prev = val,
-                .forward => self.to_next = val,
-            }
-        }
-    } = .{},
+    _0x9: u2 = 0,
     clear_errors: bool = false,
-    clear_axis_carrier_info: bool = false,
+    _0xC: u1 = 0,
     prev_axis_isolate_link: bool = false,
     next_axis_isolate_link: bool = false,
-    _15: u1 = 0,
+    _0xF: u1 = 0,
     reset_pull_carrier: packed struct(u3) {
         axis1: bool = false,
         axis2: bool = false,

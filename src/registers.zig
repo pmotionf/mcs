@@ -68,6 +68,27 @@ pub fn nestedWrite(
             try writer.print("{s},\n", .{@tagName(val)});
             written_bytes += std.fmt.count("{s},\n", .{@tagName(val)});
         },
+        .@"union" => {
+            try writer.writeBytesNTimes("    ", indent);
+            written_bytes += 4 * indent;
+            try writer.print("{s} (union): {{\n", .{name});
+            written_bytes += name.len + 4;
+            inline for (ti.@"union".fields) |field| {
+                if (field.name[0] == '_') {
+                    continue;
+                }
+                written_bytes += try nestedWrite(
+                    field.name,
+                    @field(val, field.name),
+                    indent + 1,
+                    writer,
+                );
+            }
+            try writer.writeBytesNTimes("    ", indent);
+            written_bytes += 4 * indent;
+            try writer.writeAll("},\n");
+            written_bytes += 3;
+        },
         else => {
             unreachable;
         },
